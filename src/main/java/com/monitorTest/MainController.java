@@ -33,12 +33,6 @@ public class MainController {
         return "index";
     }
     
-    @RequestMapping("/Send")
-    public String sendEmail() {
-    	email.sendEmail();
-    	return "sent";
-    }
-    
     @RequestMapping("/Stats")
     public ModelAndView statsPage() {
     	List<Statistics> list = new ArrayList<Statistics>();

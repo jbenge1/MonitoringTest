@@ -1,7 +1,12 @@
 package com.monitorTest;
 
 import java.util.HashMap;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,11 +21,21 @@ public class ScheduledTasks {
 	private HashMap<String,Object> statsMap = null;
 	private Statistics stats = new Statistics();
 	private Email email = new Email();
-		
+	private final String PATH = "/home/justin/Documents/workspace/MonitoringTest/";
+	
+	@Value("${cpuLoadThresh}")
+	private double cpuLoadThresh;
+	
+	@Value("${memThresh}")
+	private double memThresh;
+	
+	@Value("${diskThresh}")
+	private double diskThresh;
+	
 	/**
 	 * 
 	 */
-	@Scheduled(fixedRate = 300000)
+	@Scheduled(fixedRateString = "${checkRate}")
 	public void updateStats() {
 		statsMap = GetJson.getStats(url);
 		stats.setMem((Integer)statsMap.get("mem"));
@@ -45,17 +60,40 @@ public class ScheduledTasks {
 	 * model that will be able to display all the alerts to some endpoint
 	 * 
 	 */
-	@Scheduled(fixedRate = 300000, initialDelay = 1000)
+	@Scheduled(fixedRateString = "${checkRate}", initialDelayString = "${initialDelay}")
 	public void checkStats() {
 		//here is where we will check against thresholds, then email accordingly
-		System.out.println("Checking load average and status");
+		//Check Status
 		if(!stats.getStatus().equals("UP")) {
 			System.out.println("Application is down currenly...");
-			email.sendEmail();
 		}
+		//Check cpu load
 		if(stats.getLoadAvgPerCore() > 1) {
-			System.out.println("Load average to high sending email report");
-			email.sendEmail();
+			try {
+				byte[] encoded = Files.readAllBytes(Paths.get("HIGH_CPU.txt"));
+				String body = new String(encoded, StandardCharsets.UTF_8);
+				System.out.println("Load average to high sending email report");
+				email.sendEmail(body);
+			}catch(IOException e) {}
+		}
+		//check memory
+		System.out.println((double)stats.getMemUsed() / (double)stats.getMem());
+		if((double)stats.getMemUsed() / (double)stats.getMem() >= 0.7) {
+			try {
+				byte[] encoded = Files.readAllBytes(Paths.get("HIGH_MEMORY.txt"));
+				String body = new String(encoded, StandardCharsets.UTF_8);
+				System.out.println("Memory usage high sending email report");
+				email.sendEmail(body);
+			}catch(IOException e) {}
+		}
+		//check diskSpace (have not tested this as I don't know how to eat through all of my diskspace....
+		if(stats.getDiskUsed() / stats.getDiskFree() > diskThresh) {
+			try {
+				byte[] encoded = Files.readAllBytes(Paths.get("HIGH_DISK_USE.txt"));
+				String body = new String(encoded, StandardCharsets.UTF_8);
+				System.out.println("Disk Space low sending email report");
+				email.sendEmail(body);
+			}catch(IOException e) {}
 		}
 	}
 	

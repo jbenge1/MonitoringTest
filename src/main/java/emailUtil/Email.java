@@ -17,13 +17,12 @@ public class Email {
 	 * or the file itself. Then read in the contents of the file which will be 
 	 * the message body (subject too?)
 	 */
-	public void sendEmail() {
+	public void sendEmail(String body) {
 		String smtpHostServer = "smtp.mailtrap.io";
 		Properties props = System.getProperties();
 		
 		props.put("mail.smtp.host", smtpHostServer);
 		Session session = Session.getInstance(props);
-		
-		EmailUtility.sendEmail(session, TO_EMAIL, "TEST", "HIGH CPU USAGE", USER, PASS);
+		EmailUtility.sendEmail(session, TO_EMAIL, "TEST", body, USER, PASS);
 	}
 }

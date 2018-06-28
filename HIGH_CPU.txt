@@ -1,0 +1,2 @@
+HIGH CPU USAGE
+load average greater than 1.0 per core
