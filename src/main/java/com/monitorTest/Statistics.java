@@ -11,6 +11,8 @@ public class Statistics {
 	private double loadAverage;
 	private int cores;
 	
+	private boolean cpuFlag, memFlag, statusFlag, diskFlag;
+	
 	private double loadAvgPerCore;
 	
 	//The idea is to have a string mapping the type of alert, to a list of all alerts
@@ -33,6 +35,11 @@ public class Statistics {
 		this.cores = cores;
 		
 		loadAvgPerCore = loadAverage / cores;
+		cpuFlag = false;
+		memFlag = false;
+		statusFlag = false;
+		diskFlag = false;
+		
 	}
 
 	public void addAlert(String type, String alert) {
@@ -89,6 +96,22 @@ public class Statistics {
 		this.loadAverage = loadAvg;
 	}
 	
+	public void setCpuFlag(boolean flag) {
+		this.cpuFlag = flag;
+	}
+	
+	public void setDiskFlag(boolean flag) {
+		this.diskFlag = flag;
+	}
+	
+	public void setMemFlag(boolean flag) {
+		this.memFlag = flag;
+	}
+	
+	public void setStatusFlag(boolean flag) {
+		this.statusFlag = flag;
+	}
+	
 	public String getStatus() {
 		return this.status;
 	}
@@ -120,5 +143,20 @@ public class Statistics {
 	public double getLoadAverage() {
 		return this.loadAverage;
 	}
+
+	public boolean getCpuFlag() {
+		return this.cpuFlag;
+	}
 	
+	public boolean getMemFlag() {
+		return this.memFlag;
+	}
+	
+	public boolean getDiskFlag() {
+		return this.diskFlag;
+	}
+	
+	public boolean getStatusFlag() {
+		return this.statusFlag;
+	}
 }

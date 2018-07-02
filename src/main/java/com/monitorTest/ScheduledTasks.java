@@ -56,45 +56,53 @@ public class ScheduledTasks {
 	 * Check the health of the application every five minutes, however
 	 * we must wait a little bit (1 second) after the inital start of the 
 	 * program to allow our variables to be initialized.. 
-	 * I will also need to possibly add in an alerts variable to the statistics
-	 * model that will be able to display all the alerts to some endpoint
 	 * 
 	 */
 	@Scheduled(fixedRateString = "${checkRate}", initialDelayString = "${initialDelay}")
 	public void checkStats() {
 		//here is where we will check against thresholds, then email accordingly
 		//Check Status
-		if(!stats.getStatus().equals("UP")) {
+		if(!stats.getStatus().equals("UP") && !stats.getStatusFlag()) {
 			System.out.println("Application is down currenly...");
 		}
 		//Check cpu load
-		if(stats.getLoadAvgPerCore() > 1) {
+		if(stats.getLoadAvgPerCore() > cpuLoadThresh && !stats.getCpuFlag()) {
 			try {
 				byte[] encoded = Files.readAllBytes(Paths.get("HIGH_CPU.txt"));
 				String body = new String(encoded, StandardCharsets.UTF_8);
 				System.out.println("Load average to high sending email report");
 				email.sendEmail(body);
+				stats.setCpuFlag(true);
 			}catch(IOException e) {}
 		}
 		//check memory
-		System.out.println((double)stats.getMemUsed() / (double)stats.getMem());
-		if((double)stats.getMemUsed() / (double)stats.getMem() >= 0.7) {
+		if((double)stats.getMemUsed() / (double)stats.getMem() >= memThresh && !stats.getMemFlag()) {
 			try {
 				byte[] encoded = Files.readAllBytes(Paths.get("HIGH_MEMORY.txt"));
 				String body = new String(encoded, StandardCharsets.UTF_8);
 				System.out.println("Memory usage high sending email report");
 				email.sendEmail(body);
+				stats.setMemFlag(true);
 			}catch(IOException e) {}
 		}
 		//check diskSpace (have not tested this as I don't know how to eat through all of my diskspace....
-		if(stats.getDiskUsed() / stats.getDiskFree() > diskThresh) {
+		if(stats.getDiskUsed() / stats.getDiskFree() > diskThresh && !stats.getDiskFlag()) {
 			try {
 				byte[] encoded = Files.readAllBytes(Paths.get("HIGH_DISK_USE.txt"));
 				String body = new String(encoded, StandardCharsets.UTF_8);
 				System.out.println("Disk Space low sending email report");
 				email.sendEmail(body);
+				stats.setDiskFlag(true);
 			}catch(IOException e) {}
 		}
+		if(stats.getLoadAvgPerCore() < 1)
+			stats.setCpuFlag(false);
+		if((double)stats.getMemUsed() / (double)stats.getMem() < 0.7 )
+			stats.setMemFlag(false);
+		if(stats.getDiskUsed() / stats.getDiskFree() <= diskThresh)
+			stats.setDiskFlag(false);
+		if(stats.getStatus().equals("UP"))
+			stats.setStatusFlag(false);
 	}
 	
 	/**

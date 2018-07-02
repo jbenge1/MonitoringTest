@@ -33,7 +33,6 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-tomcat</artifactId>
-			<!--  <scope>provided</scope> -->
 		</dependency>
 		
 		<dependency>
@@ -59,7 +58,7 @@
 			 <scope>provided</scope> 
 		</dependency>
 		
-		<!-- Optional, for bootstrap -->
+       <!--	Optional, for bootstrap -->
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>bootstrap</artifactId>
@@ -69,7 +68,6 @@
 		<dependency>
 			<groupId>com.sun.mail</groupId>
 			<artifactId>javax.mail</artifactId>
-			<version>1.5.5</version>
 		</dependency>
 		<!-- <dependency>
 			<groupId>org.springframework.boot</groupId>
