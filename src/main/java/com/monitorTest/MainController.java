@@ -26,9 +26,6 @@ public class MainController {
 	
     @RequestMapping("/")
     public String home() throws IOException {  
-    	/*try {
-    		map = GetJson.getDiskUsage("http://192.168.4.130:8080");
-    	}catch(IOException e) {}*/
     	GetJson.getDiskUsage("http://192.168.4.130:8080");
         return "index";
     }

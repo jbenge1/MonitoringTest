@@ -21,7 +21,7 @@ public class ScheduledTasks {
 	private HashMap<String,Object> statsMap = null;
 	private Statistics stats = new Statistics();
 	private Email email = new Email();
-	private final String PATH = "/home/justin/Documents/workspace/MonitoringTest/";
+//	private final String PATH = "/home/justin/Documents/workspace/MonitoringTest/";
 	
 	@Value("${cpuLoadThresh}")
 	private double cpuLoadThresh;
